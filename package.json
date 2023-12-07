@@ -1,0 +1,27 @@
+{
+  "name": "@jon49/web",
+  "version": "0.0.0",
+  "description": "Packages for MVC service workers.",
+  "type": "module",
+  "files": ["lib"],
+  "exports": {
+      "./html-form-spa": "./lib/html-form-spa.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "service-worker",
+    "MVC"
+  ],
+  "author": "Jon Nyman",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jon49/jon49-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jon49/jon49-web/issues"
+  },
+  "homepage": "https://github.com/jon49/jon49-web#readme"
+}
