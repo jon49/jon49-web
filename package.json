@@ -1,11 +1,12 @@
 {
   "name": "@jon49/web",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Packages for MVC service workers.",
   "type": "module",
   "files": ["lib"],
   "exports": {
-      "./html-form-spa": "./lib/html-form-spa.js"
+      "./html-form-spa": "./lib/html-form-spa.js",
+      "./x-dialog.js": "./lib/x-dialog.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
