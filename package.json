@@ -1,13 +1,14 @@
 {
   "name": "@jon49/web",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Packages for MVC service workers.",
   "type": "module",
   "files": ["lib"],
   "exports": {
       "./html-form-spa.js": "./lib/html-form-spa.js",
       "./x-dialog.js": "./lib/x-dialog.js",
-      "./x-toaster.js": "./lib/x-toaster.js"
+      "./x-toaster.js": "./lib/x-toaster.js",
+      "./htmz-spa.ts": "./lib/htmz-spa.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
