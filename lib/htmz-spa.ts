@@ -1,3 +1,6 @@
+export const hook: { cb: null | ((frame: HTMLIFrameElement) => void) } = {
+    cb: null
+}
 let iframe = document.createElement("iframe")
 iframe.name = "htmz"
 iframe.hidden = true
@@ -13,6 +16,7 @@ function htmz(event: Event) {
         if (!select) return
         // @ts-ignore
         window.htmf.selectSwap(select, dom, true)
+        hook.cb?.(frame)
     });
 }
 
