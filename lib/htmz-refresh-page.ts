@@ -1,17 +1,12 @@
-// @ts-ignore
 let doc = document
 
-let temp = doc.createElement("x")
-temp.innerHTML = `
+let x = doc.createElement("x")
+x.innerHTML = `
 <form hidden is=form-subscribe data-event="refresh" hf-ignore target=htmz>
 <input type=hidden name=hz>
 </form>`
 
-let $form = temp.querySelector("form") as HTMLFormElement
-doc.body.appendChild($form)
+doc.body.appendChild(x.firstElementChild as HTMLFormElement)
 
-// @ts-ignore
-doc.addEventListener("htmz:completed", (event: CustomEvent) => {
-    $form.action = event.detail.frame.contentDocument?.location.href ?? "/web/"
-})
+export {}
 
