@@ -1,18 +1,12 @@
-const doc = document
-const w = window
-
-let x = doc.createElement("x")
-x.innerHTML = `
-<iframe
-    name=htmz
-    hidden
-    hf-select="title,#head,#nav-main,main,#errors,#toasts,#scripts">
-</iframe>`
-let $frame = x.firstElementChild as HTMLIFrameElement
-doc.body.appendChild($frame)
-
-$frame.onload =
+export default `
+<script>
+(() => {
+let wasCalled = false
 function htmz() {
+    if (!wasCalled) {
+        wasCalled = true
+        return
+    }
     setTimeout(() => {
         let dom = ($frame.contentDocument?.querySelectorAll("head>template")[0] as HTMLTemplateElement)?.content
         if (!dom) return
@@ -22,6 +16,12 @@ function htmz() {
         w.htmf.selectSwap(select, dom, true)
     });
 }
+})()
+</script>
 
-export {}
-
+<iframe
+    name=htmz
+    hidden
+    hf-select="title,#head,#nav-main,main,#errors,#toasts,#scripts">
+</iframe>
+`
