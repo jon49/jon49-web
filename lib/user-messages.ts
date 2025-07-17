@@ -1,7 +1,7 @@
 // @ts-ignore
-doc.addEventListener("user-messages", (e: CustomEvent) => {
-    let template = doc.getElementById("toast-template")
-    let toasts = doc.getElementById("toasts")
+document.addEventListener("user-messages", (e: CustomEvent) => {
+    let template = document.getElementById("toast-template")
+    let toasts = document.getElementById("toasts")
     if (!(template && template instanceof HTMLTemplateElement) || !toasts) return
     if (Array.isArray(e.detail)) {
         for (let message of e.detail) {

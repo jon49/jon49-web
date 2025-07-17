@@ -1,3 +1,3 @@
-if (doc.location.search.includes("login=success")) {
-    doc.location.href = "/web/"
+if (document.location.search.includes("login=success")) {
+    document.location.href = "/web/"
 }
