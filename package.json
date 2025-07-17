@@ -1,6 +1,6 @@
 {
   "name": "@jon49/web",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Packages for MVC service workers.",
   "type": "module",
   "files": [
@@ -11,7 +11,11 @@
     "./htmz-refresh-page.ts": "./lib/htmz-refresh-page.ts",
     "./htmz-spa.ts": "./lib/htmz-spa.ts",
     "./x-dialog.js": "./lib/x-dialog.js",
-    "./x-toaster.js": "./lib/x-toaster.js"
+    "./x-toaster.js": "./lib/x-toaster.js",
+    "./app-theme.js": "./lib/app-theme.ts",
+    "./app-updater.js": "./lib/app-updater.ts",
+    "./login.js": "./lib/login.ts",
+    "./user-messages.js": "./lib/user-messages.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
