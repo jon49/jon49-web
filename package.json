@@ -1,16 +1,17 @@
 {
   "name": "@jon49/web",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Packages for MVC service workers.",
   "type": "module",
   "files": [
     "lib"
   ],
   "exports": {
-    "./html-form-spa.js": "./lib/html-form-spa.js",
-    "./htmz-refresh-page.ts": "./lib/htmz-refresh-page.ts",
-    "./htmz-spa.ts": "./lib/htmz-spa.ts",
-    "./x-dialog.js": "./lib/x-dialog.js",
+    "./_action.js": "./lib/_action.ts",
+    "./anchor.js": "./lib/anchor.ts",
+    "./app-actions.js": "./lib/app-actions.ts",
+    "./htmz-be.js": "./lib/htmz-be.ts",
+    "./htmz-morph.js": "./lib/htmz-morph.ts",
     "./toast.js": "./lib/toast.js",
     "./app-theme.js": "./lib/app-theme.ts",
     "./login.js": "./lib/login.ts",
@@ -32,5 +33,8 @@
   "bugs": {
     "url": "https://github.com/jon49/jon49-web/issues"
   },
-  "homepage": "https://github.com/jon49/jon49-web#readme"
+  "homepage": "https://github.com/jon49/jon49-web#readme",
+  "dependencies": {
+    "morphdom": "^2.7.8"
+  }
 }
