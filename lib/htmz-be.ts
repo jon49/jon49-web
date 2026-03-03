@@ -19,6 +19,8 @@ window.htmz = function htmz(frame: HTMLIFrameElement) {
     target[swap]?.(el);
   }
 
+  document.dispatchEvent(new CustomEvent("hz:completed", {}))
+
   frame.remove();
   document.body.appendChild(frame);
   location.replace("about:blank");
