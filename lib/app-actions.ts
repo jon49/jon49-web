@@ -2,7 +2,15 @@ let w = window
 
 let tick = setTimeout
 
-export type AppAction = (e: Event, el: HTMLElement, form?: HTMLFormElement) => 1 | void
+export interface AppActionContext {
+  app: Record<string, AppAction>
+  ev: Event
+  target: HTMLElement
+  el: HTMLElement
+  form?: HTMLFormElement
+}
+
+export type AppAction = (ctx: AppActionContext) => 1 | void
 
 declare global {
   interface Window {
@@ -13,7 +21,7 @@ declare global {
 w.app = w.app || {}
 
 Object.assign(w.app, {
-  redirect: (_, el) => {
+  redirect: ({ el }) => {
     tick(() => document.location.href = el.dataset.url || "/" )
   },
 
@@ -21,7 +29,7 @@ Object.assign(w.app, {
     tick(() => document.location.reload(), 500)
   },
 
-  theme: (_, el) => {
+  theme: ({ el }) => {
     tick(() => {
       let theme = el.dataset.theme;
       let docElement = document.documentElement
@@ -30,21 +38,21 @@ Object.assign(w.app, {
     })
   },
 
-  reset: (_, __, form) => {
+  reset: ({ form }) => {
     tick(() => form?.reset())
   },
 
-  clearAutoFocus: (_, target) => {
+  clearAutoFocus: ({ target }) => {
     target.removeAttribute("autofocus")
   },
 
-  confirm: (e, target): 1 | void => {
+  confirm: ({ ev, target }): 1 | void => {
     if (!confirm(target.dataset.confirm)) {
-      e.preventDefault()
+      ev.preventDefault()
     }
   },
 
-  defaultTheme: (_, target) => {
+  defaultTheme: ({ target }) => {
     // Get system theme
     let isDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
     let theme = isDark ? "dark" : "light"
@@ -53,7 +61,7 @@ Object.assign(w.app, {
     ;(target as HTMLAnchorElement).href = url.toString()
   },
 
-  submit: (_, __, form) => {
+  submit: ({ form }) => {
     form?.requestSubmit()
   }
 } as Record<string, AppAction>)

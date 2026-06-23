@@ -20,7 +20,7 @@ document.addEventListener("hz:completed", _ => {
   anchor = {}
 })
 
-window.app.anchor = (_, target) => {
+window.app.anchor = ({ target }) => {
   let anchorTargetId = target.dataset.anchor
   if (!anchorTargetId) return
   let el = document.querySelector(anchorTargetId)

@@ -1,7 +1,7 @@
 {
   "name": "@jon49/web",
-  "version": "0.11.1",
-  "description": "Packages for MVC service workers.",
+  "version": "0.12.0",
+  "description": "Browser modules for MVC-style web apps.",
   "type": "module",
   "files": [
     "lib"
@@ -14,6 +14,7 @@
     "./htmz-morph.js": "./lib/htmz-morph.ts",
     "./toast.js": "./lib/toast.js",
     "./app-theme.js": "./lib/app-theme.ts",
+    "./disconnect-watcher.js": "./lib/disconnect-watcher.ts",
     "./login.js": "./lib/login.ts",
     "./user-messages.js": "./lib/user-messages.ts"
   },
@@ -21,7 +22,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "service-worker",
+    "browser",
     "MVC"
   ],
   "author": "Jon Nyman",
@@ -36,5 +37,8 @@
   "homepage": "https://github.com/jon49/jon49-web#readme",
   "dependencies": {
     "morphdom": "^2.7.8"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
   }
 }

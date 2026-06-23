@@ -49,7 +49,7 @@ function handleCall(
 
     fn = w.app?.[action]
     if (fn) {
-      fn.call(w.app, e, target, form)
+      fn.call(null, { app: w.app, ev: e, target, el: target, form })
     } else {
       console.warn(`ACTION: Could not find function ${action}. Target element`, target)
     }

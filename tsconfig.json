@@ -5,11 +5,11 @@
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "lib": [
-            "webworker",
             "ESNext",
             "DOM",
             "DOM.Iterable"
         ],
+        "types": [],
         "strict": true,
         "noImplicitAny": true,
         "strictFunctionTypes": true,
