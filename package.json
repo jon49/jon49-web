@@ -8,13 +8,13 @@
   ],
   "exports": {
     "./_action.js": "./lib/_action.ts",
+    "./_action.lifecycle.js": "./lib/_action.lifecycle.ts",
     "./anchor.js": "./lib/anchor.ts",
     "./app-actions.js": "./lib/app-actions.ts",
     "./htmz-be.js": "./lib/htmz-be.ts",
     "./htmz-morph.js": "./lib/htmz-morph.ts",
     "./toast.js": "./lib/toast.js",
     "./app-theme.js": "./lib/app-theme.ts",
-    "./disconnect-watcher.js": "./lib/disconnect-watcher.ts",
     "./login.js": "./lib/login.ts",
     "./user-messages.js": "./lib/user-messages.ts"
   },

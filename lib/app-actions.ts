@@ -13,8 +13,18 @@ export interface AppActionContext {
 export type AppAction = (ctx: AppActionContext) => 1 | void
 
 declare global {
+  /** Attribute-triggered handlers registered on `window.app`. */
+  interface AppRegistry {
+    [action: string]: AppAction
+  }
+  /**
+   * Non-action utilities also hung off `window.app`. Modules that register a
+   * utility (e.g. disconnect-watcher.ts) merge its precise signature here, so
+   * call sites are type-checked instead of needing `// @ts-ignore`.
+   */
+  interface AppUtilities {}
   interface Window {
-    app: Record<string, AppAction>
+    app: AppRegistry & AppUtilities
   }
 }
 

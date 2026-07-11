@@ -1,3 +1,34 @@
+export interface Disconnectable {
+  disconnectedCallback: () => void
+}
+
+class DisconnectWatcher {
+  registry = new Map<HTMLElement, Disconnectable>()
+
+  constructor() {
+    let observer = new MutationObserver(mutations => {
+      if (this.registry.size === 0) return
+      for (let mutation of mutations) {
+        for (let node of mutation.removedNodes) {
+          for (let [el, instance] of this.registry) {
+            if (node.contains(el)) {
+              this.registry.delete(el)
+              instance.disconnectedCallback()
+            }
+          }
+        }
+      }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+  }
+
+  register(el: HTMLElement, instance: Disconnectable) {
+    this.registry.set(el, instance)
+  }
+}
+
+let watcher = new DisconnectWatcher()
+
 const doc = document, w = window
 
 for (let event of ["click", "change", "submit"]) {
@@ -49,7 +80,10 @@ function handleCall(
 
     fn = w.app?.[action]
     if (fn) {
-      fn.call(null, { app: w.app, ev: e, target, el: target, form })
+      let result = fn.call(null, { app: w.app, ev: e, target, el: target, form })
+      if (result?.disconnectedCallback) {
+        watcher.register(target, result as Disconnectable)
+      }
     } else {
       console.warn(`ACTION: Could not find function ${action}. Target element`, target)
     }
