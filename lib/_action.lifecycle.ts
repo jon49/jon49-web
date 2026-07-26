@@ -1,6 +1,24 @@
+// Component lifecycle for `_load` actions. An action invoked via `_load` may
+// return an object with a `disconnectedCallback`; it is called once the element
+// leaves the document.
+//
+// Identity is the contract. Both the run-once record and the disconnect registry
+// are keyed on the element reference, so a component survives a swap exactly as
+// long as its DOM node does. Under htmz-be every swapped node is new, so
+// components always tear down and re-init.
+//
+// Under htmz-morph, **give any `_load` element a stable `id`**. Idiomorph matches
+// by id-set intersection; an id-less node in a re-rendered list is instead matched
+// positionally and morphed in place to hold different content. It never leaves the
+// document, so nothing here notices: `sweep()` sees `isConnected`, no
+// `disconnectedCallback` runs, and `hasLoaded` keeps suppressing `_load`. The
+// component silently keeps running against content it was not initialized for.
+// That failure is quiet by design — an id is the only thing that prevents it.
 export interface Disconnectable {
     disconnectedCallback: () => void
 }
+
+let hasLoaded: WeakMap<HTMLElement, string[]> = new WeakMap()
 
 class DisconnectWatcher {
     registry = new Map<HTMLElement, Disconnectable>()
@@ -13,13 +31,19 @@ class DisconnectWatcher {
 
     // Drop anything no longer in the document. Keying off `isConnected` catches
     // removals the observer can't attribute to a single removed node (moves into
-    // detached trees, morphdom replacements) and keeps this O(registry) instead
-    // of O(registry * removedNodes).
+    // detached trees, nodes idiomorph discards rather than morphs) and keeps this
+    // O(registry) instead of O(registry * removedNodes).
+    //
+    // This only reads `isConnected`, so it works under either swap module —
+    // htmz-be replaces nodes outright, htmz-morph preserves them.
     sweep() {
         if (this.registry.size === 0) return
         for (let [el, instance] of this.registry) {
             if (!el.isConnected) {
                 this.registry.delete(el)
+                // Forget the run-once record too, so a re-attached element gets
+                // re-initialized rather than staying dead after its disconnect.
+                hasLoaded.delete(el)
                 instance.disconnectedCallback()
             }
         }
@@ -45,13 +69,15 @@ for (let event of ["click", "change", "submit"]) {
     })
 }
 
+// `_load` is left on the element. `hasLoaded` is what enforces run-once, and it
+// does so per element+action, so stripping the attribute buys nothing — idiomorph
+// restores it from the server markup on the next morph anyway.
 function handleLoad() {
     for (let el of doc.querySelectorAll("[_load]")) {
         let action = el.getAttribute("_load")
         if (!action) continue
         // @ts-ignore
         handleCall(new Event("load"), el, action)
-        el.removeAttribute("_load")
     }
 }
 
@@ -68,8 +94,6 @@ function findAttr(target: EventTarget | null, attr: string): string | null | und
     }
     return result
 }
-
-let hasLoaded: WeakMap<HTMLElement, string[]> = new WeakMap()
 
 function handleCall(
     e: Event,

@@ -1,4 +1,5 @@
-import morphdom from "morphdom"
+/// <reference path="./idiomorph.d.ts" />
+import { Idiomorph } from "idiomorph"
 
 // @ts-ignore
 window.htmz = function htmz(frame: HTMLIFrameElement) {
@@ -7,7 +8,15 @@ window.htmz = function htmz(frame: HTMLIFrameElement) {
 
   let doc = frame.contentDocument
   if (doc == null) return
-  for (let el of Array.from(doc.body.children).concat(Array.from(doc.head.children))) {
+  for (let incoming of Array.from(doc.body.children).concat(Array.from(doc.head.children))) {
+    // The iframe is a separate realm, so `incoming instanceof Node` is false up
+    // here. Idiomorph branches on exactly that and falls through to its "iterable
+    // of nodes" case, which throws on a lone element. importNode re-creates the
+    // subtree in this document; adoptNode is not enough, as a node keeps the
+    // prototype of the realm that created it. Inserting a node adopts it
+    // implicitly, which is why the hz-swap paths never needed this.
+    let el = document.importNode(incoming, true)
+
     // before, prepend, append, after
     let swap = el.getAttribute("hz-swap")
     el.removeAttribute("hz-swap")
@@ -31,8 +40,10 @@ window.htmz = function htmz(frame: HTMLIFrameElement) {
       if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
         target.replaceWith(el)
       } else {
-        // @ts-ignore
-        morphdom(target, el)
+        // outerHTML is idiomorph's default. Matching is by id-set intersection,
+        // so any element you want preserved across a morph — anything holding
+        // listeners, transitions, or an `_load` component — needs a stable id.
+        Idiomorph.morph(target, el)
       }
     } else {
       // @ts-ignore

@@ -34,7 +34,7 @@ Two interchangeable implementations of the same pattern (pick **one** per app): 
 
 - `hz-target` attribute (or the element's `id`) selects the destination via `querySelector`.
 - `hz-swap` attribute names the DOM method to apply (`replaceWith` default in `htmz-be`; `before`/`prepend`/`append`/`after`/etc.). `<template>` elements have their `content` cloned before swapping.
-- `htmz-morph.ts` differs by using `morphdom` (the sole runtime dependency) for in-place diffing when no `hz-swap` is given, preserving DOM state instead of replacing.
+- `htmz-morph.ts` differs by using `idiomorph` (the sole runtime dependency) for in-place diffing when no `hz-swap` is given, preserving DOM state instead of replacing. Idiomorph matches nodes by id-set intersection, so **elements that must survive a swap need a stable `id`** — that includes any `_load` component tracked by `_action.lifecycle.ts`, whose run-once and disconnect bookkeeping is keyed on node identity. An id-less element in a re-rendered list is matched positionally and morphed in place to hold different content without ever leaving the document, so no `disconnectedCallback` fires and `_load` does not re-run. The package publishes no type declarations; `lib/idiomorph.d.ts` supplies them.
 
 After swapping, both dispatch `document` event `hz:completed` and reset the iframe to `about:blank`. `hz:completed` is the system-wide "DOM changed" signal — `_action.ts` (re-runs `_load`) and `anchor.ts` (restores scroll) both listen for it.
 
