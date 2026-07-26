@@ -10,9 +10,19 @@ window.htmz = function htmz(frame: HTMLIFrameElement) {
     let swap = el.getAttribute("hz-swap") ?? "replaceWith";
     el.removeAttribute("hz-swap");
     let targetQuery = el.getAttribute("hz-target") || (el.id && `#${el.id}`);
-    el.removeAttribute("hz-target");
-    let target = document.querySelector(targetQuery);
+    if (!targetQuery) {
+      console.warn("HTMZ: No hz-target or id on incoming element.", el);
+      continue;
+    }
+    let target;
+    try {
+      target = document.querySelector(targetQuery);
+    } catch {
+      console.warn(`HTMZ: Invalid hz-target selector "${targetQuery}".`, el);
+      continue;
+    }
     if (!target) continue;
+    el.removeAttribute("hz-target");
     // @ts-ignore
     if (el.tagName === "TEMPLATE") el = el.content.cloneNode(true);
     // @ts-ignore
