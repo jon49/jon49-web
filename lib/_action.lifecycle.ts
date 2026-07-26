@@ -6,20 +6,23 @@ class DisconnectWatcher {
     registry = new Map<HTMLElement, Disconnectable>()
 
     constructor() {
-        let observer = new MutationObserver(mutations => {
-            if (this.registry.size === 0) return
-            for (let mutation of mutations) {
-                for (let node of mutation.removedNodes) {
-                    for (let [el, instance] of this.registry) {
-                        if (node.contains(el)) {
-                            this.registry.delete(el)
-                            instance.disconnectedCallback()
-                        }
-                    }
-                }
+        let observer = new MutationObserver(() => this.sweep())
+        observer.observe(document.documentElement, { childList: true, subtree: true })
+        document.addEventListener("hz:completed", () => this.sweep())
+    }
+
+    // Drop anything no longer in the document. Keying off `isConnected` catches
+    // removals the observer can't attribute to a single removed node (moves into
+    // detached trees, morphdom replacements) and keeps this O(registry) instead
+    // of O(registry * removedNodes).
+    sweep() {
+        if (this.registry.size === 0) return
+        for (let [el, instance] of this.registry) {
+            if (!el.isConnected) {
+                this.registry.delete(el)
+                instance.disconnectedCallback()
             }
-        })
-        observer.observe(document.body, { childList: true, subtree: true })
+        }
     }
 
     register(el: HTMLElement, instance: Disconnectable) {
@@ -84,9 +87,9 @@ function handleCall(
         if (fn) {
             if (e.type === "load") {
                 if (!hasLoaded.get(target)?.includes(action)) {
-                    let result = fn.call(null, { app: w.app, ev: e, target, el: target, form })
                     hasLoaded.get(target)?.push(action) || hasLoaded.set(target, [action])
-                    if (result.disconnectedCallback) {
+                    let result = fn.call(null, { app: w.app, ev: e, target, el: target, form })
+                    if (result?.disconnectedCallback) {
                         watcher.register(target, result as Disconnectable)
                     }
                 }
