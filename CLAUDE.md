@@ -11,7 +11,9 @@ The `exports` map in `package.json` exposes each module as a `*.js` specifier th
 ## Commands
 
 - **Type-check / emit declarations:** `npx tsc` — config emits declarations only (`emitDeclarationOnly`, `outDir: ./dist`). No JS is bundled or transpiled for shipping; `dist/` and `node_modules/` are gitignored.
-- **Tests:** none. The `npm test` script is a placeholder that exits 1.
+- **Tests:** `npm test` — `node:test` over jsdom, no test framework. Node runs the `.ts` sources directly via `--experimental-strip-types`, so it needs Node >= 22.6 and every construct in `lib/` must stay erasable (no enums, namespaces, or parameter properties). `npm run check` type-checks `lib/` for shipping and then `lib/` + `test/` together via `tsconfig.test.json`; `test/` is outside the published `files` list and outside the base config's `include`.
+  - `test/setup.ts` installs a jsdom `window`/`document` on `globalThis` **before** any lib module is imported — these modules read the DOM at import time, so test files must import it first. It also copies `Event`/`CustomEvent`/`Node` etc. unconditionally, since Node's own globals of those names are not interchangeable with jsdom's.
+  - `responseFrame()` builds an `<iframe>` with stubbed `contentDocument`/`contentWindow` pointing at a *second* JSDOM instance. The second instance is the point: it is a separate realm, so its nodes fail `instanceof Node` in the main page exactly as a real iframe's do. Navigating a real iframe also works but re-enters, because htmz removes and re-appends the frame, which makes jsdom re-fetch `src`.
 - **Lint:** none configured. `tsconfig.json` enforces strictness (`strict`, `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`), so `npx tsc` is the closest thing to a lint pass.
 
 Target is `es2024` with `webworker` + `DOM` libs — code may run in either a window or a service worker context.
