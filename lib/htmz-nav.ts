@@ -8,8 +8,10 @@ import { Idiomorph } from "idiomorph"
 // as they would for a normal page load. Back and forward load their page the
 // same way and put back its scroll position.
 //
-// Which links: target=_self (links without one go to the htmz iframe), on this
-// origin, under the same first path segment as this page (/web/...). Not with
+// Which links: those that open in this window (target=_self, or no target and
+// no <base target>; a page with <base target=htmz> sends its other links to
+// the htmz iframe), on this origin, under the same first path segment as this
+// page (/web/...). Not with
 // `download` or data-hz-nav=off, and not clicks with a modifier key (new tab
 // and the like). A page with other stylesheets or scripts than this one, or a
 // response that isn't an HTML page, is loaded normally instead: inline scripts
@@ -108,7 +110,8 @@ document.addEventListener("click", e => {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
   let a = e.target instanceof Element ? e.target.closest("a[href]") : null
   if (!(a instanceof HTMLAnchorElement)) return
-  if (a.target !== "_self" || a.hasAttribute("download") || a.dataset.hzNav === "off") return
+  let target = a.getAttribute("target") ?? document.querySelector("base[target]")?.getAttribute("target") ?? ""
+  if ((target !== "" && target !== "_self") || a.hasAttribute("download") || a.dataset.hzNav === "off") return
   let url = new URL(a.href)
   if (url.origin !== location.origin || scopeOf(url.pathname) !== scopeOf(location.pathname)) return
   // A link to a spot on this page: the browser scrolls to it.

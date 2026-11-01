@@ -21,8 +21,9 @@ let fetched: string[] = []
 }
 
 const head = `<link rel=stylesheet href="/web/css/app.css"><script src="/web/js/app.js" type=module></script>`
+// As in ../soccer: <base target=htmz>, so the app's own page links say target=_self.
 const page = (title: string, main: string, extraHead = "") =>
-    `<!doctype html><html data-theme=dark><head><title>${title}</title>${head}${extraHead}</head>` +
+    `<!doctype html><html data-theme=dark><head><base target=htmz><title>${title}</title>${head}${extraHead}</head>` +
     `<body><nav><a id=to-b href="/web/b" target=_self>B</a></nav><main id=main>${main}</main></body></html>`
 
 // Shows a page as if it had been loaded normally, at `path`.
@@ -100,6 +101,17 @@ describe("htmz-nav", () => {
         assert.deepEqual(fetched, ["/web/b"])
         assert.equal(w.location.pathname, "/web/a", "no history entry for a page not shown")
         assert.equal(doc.querySelector("#main")!.textContent, "page a")
+    })
+
+    test("takes a link with no target on a page without <base target>", async () => {
+        doc.querySelector("base")!.remove()
+        doc.querySelector("nav")!.insertAdjacentHTML("beforeend", `<a id=plain href="/web/b">B</a>`)
+        let done = navigated()
+        click("#plain")
+        await done
+
+        assert.equal(w.location.pathname, "/web/b")
+        assert.equal(doc.querySelector("#main")!.textContent, "page b")
     })
 
     test("leaves links that aren't the app's own pages alone", async () => {
