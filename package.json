@@ -13,6 +13,7 @@
     "./app-actions.js": "./lib/app-actions.ts",
     "./htmz-be.js": "./lib/htmz-be.ts",
     "./htmz-morph.js": "./lib/htmz-morph.ts",
+    "./htmz-nav.js": "./lib/htmz-nav.ts",
     "./toast.js": "./lib/toast.js",
     "./app-theme.js": "./lib/app-theme.ts",
     "./login.js": "./lib/login.ts",
