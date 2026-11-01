@@ -206,3 +206,32 @@ describe("htmz-morph", () => {
             "the page must hold an imported copy, not the iframe's node")
     })
 })
+
+describe("htmzSwap", () => {
+    const htmzSwap = (d: Document, detail?: unknown) => (globalThis as any).window.htmzSwap(d, detail)
+
+    test("swaps in a document the page rendered itself, and passes on its detail", () => {
+        resetBody(`<div id=box><p id=msg>old</p></div><div id=toasts></div>`)
+        const msg = doc.querySelector("#msg")
+        let seen: unknown = "not fired"
+        doc.addEventListener("hz:completed", (e) => { seen = (e as CustomEvent).detail }, { once: true })
+
+        htmzSwap(foreignDoc(`<div id=box><p id=msg>new</p></div><div id=toasts><p>Saved</p></div>`),
+            { handler: "save" })
+
+        assert.equal(doc.querySelector("#msg")!.textContent, "new")
+        assert.equal(doc.querySelector("#msg"), msg, "morph must reuse the existing node")
+        assert.equal(doc.querySelector("#toasts")!.textContent, "Saved")
+        assert.deepEqual(seen, { handler: "save" })
+    })
+
+    test("leaves the htmz iframe alone", () => {
+        resetBody(`<div id=box>old</div>`)
+        const frames = doc.querySelectorAll("iframe[name=htmz]").length
+
+        htmzSwap(foreignDoc(`<div id=box>new</div>`))
+
+        assert.equal(doc.querySelector("#box")!.textContent, "new")
+        assert.equal(doc.querySelectorAll("iframe[name=htmz]").length, frames)
+    })
+})

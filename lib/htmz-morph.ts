@@ -1,13 +1,11 @@
 /// <reference path="./idiomorph.d.ts" />
 import { Idiomorph } from "idiomorph"
 
-// @ts-ignore
-window.htmz = function htmz(frame: HTMLIFrameElement) {
-  let location = frame.contentWindow?.location
-  if (location == null || location.href === "about:blank") return;
-
-  let doc = frame.contentDocument
-  if (doc == null) return
+// Swaps a response document's elements into the page, then signals
+// hz:completed (with `detail`, if given). window.htmz calls it with the htmz
+// iframe's document; a page that renders a response itself, without the
+// service worker, calls window.htmzSwap with a document it parsed.
+function swapIn(doc: Document, detail?: unknown) {
   for (let incoming of Array.from(doc.body.children).concat(Array.from(doc.head.children))) {
     // The iframe is a separate realm, so `incoming instanceof Node` is false up
     // here. Idiomorph branches on exactly that and falls through to its "iterable
@@ -52,7 +50,20 @@ window.htmz = function htmz(frame: HTMLIFrameElement) {
   }
 
   // Custom event to signal hz completed
-  document.dispatchEvent(new CustomEvent("hz:completed", {}))
+  document.dispatchEvent(new CustomEvent("hz:completed", { detail }))
+}
+
+// @ts-ignore
+window.htmzSwap = swapIn
+
+// @ts-ignore
+window.htmz = function htmz(frame: HTMLIFrameElement) {
+  let location = frame.contentWindow?.location
+  if (location == null || location.href === "about:blank") return;
+
+  let doc = frame.contentDocument
+  if (doc == null) return
+  swapIn(doc)
 
   frame.remove()
   document.body.appendChild(frame)
