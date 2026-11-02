@@ -20,6 +20,10 @@ import { Idiomorph } from "idiomorph"
 // After each change it signals hz:completed with { navigation: true }, so
 // _load actions run as after any swap; listeners that only care about the
 // user's edits can skip it.
+//
+// A page that can render the app's pages itself, without a round trip to the
+// service worker, sets window.htmzFetch(url): it answers with the page's
+// Response, or null to leave that page to fetch.
 
 let current = withoutHash(location.href)
 let pending: AbortController | null = null
@@ -56,12 +60,21 @@ function copyAttributes(from: Element, to: Element) {
   }
 }
 
+async function render(url: string): Promise<Response | null> {
+  try {
+    return await ((window as any).htmzFetch?.(url) ?? null)
+  } catch (e) {
+    console.error(e)
+    return null
+  }
+}
+
 async function go(url: string, push: boolean, scrollY = 0) {
   pending?.abort()
   let controller = pending = new AbortController()
   let res: Response
   try {
-    res = await fetch(url, { signal: controller.signal })
+    res = await render(url) ?? await fetch(url, { signal: controller.signal })
   } catch {
     if (!controller.signal.aborted) location.assign(url)
     return
